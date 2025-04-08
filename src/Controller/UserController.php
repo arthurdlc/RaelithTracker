@@ -12,6 +12,10 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class UserController extends AbstractController
 {
+    // route pour la page de register, 
+    // todo : mettre possibilité de creer un compte avec google
+    // todo : faire un formulaire plus propre avec plus de champs 
+    // todo mettre en place un regex
     #[Route('/user/new', name: 'app_user_new')]
     public function new(
         Request $request,
@@ -40,14 +44,22 @@ class UserController extends AbstractController
             'form' => $form->createView(),
         ]);
     }
+
+    // route pour afficher la liste des utilisateur, 
+    // todo : mettre cette page reserver au roles : ROLE_ADMIN
+    // todo : mettere une mise en page plus propre
+    // todo : mettre en place la possibilité aux admin de changer le role d'un user
+    // todo : mettre en place la possibilité aux admin de supprimer un user
+    // todo : mettre en place la possibilité aux admin de bannir un  user dans ce cas ci un pop up apparaitra et un message de bannissement sera a saisir puis revoyer sous forme de pop up au user lors de sa prochaine connexion
     #[Route('/user', name: 'app_user_index')]
     public function index(EntityManagerInterface $em): Response
     {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN'); // 🔐 Ajoute cette ligne
+
         $users = $em->getRepository(User::class)->findAll();
 
         return $this->render('user/index.html.twig', [
             'users' => $users,
         ]);
     }
-
 }
