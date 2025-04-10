@@ -62,4 +62,33 @@ class UserController extends AbstractController
             'users' => $users,
         ]);
     }
+    // modifier un utilisateur
+    #[Route('/user/{id}/edit', name: 'app_user_edit')]
+    public function edit(
+        Request $request,
+        EntityManagerInterface $em,
+        User $user
+    ): Response {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN'); // 🔐 Vérifie que l'utilisateur est admin
+    
+        $form = $this->createForm(UserType::class, $user);
+        $form->handleRequest($request);
+    
+        if ($form->isSubmitted() && $form->isValid()) {
+            // Si nécessaire, tu peux forcer un rôle ici
+            // $user->setRoles(['ROLE_USER']); // par exemple
+    
+            $em->persist($user);
+            $em->flush();
+    
+            $this->addFlash('success', 'Utilisateur modifié avec succès');
+            return $this->redirectToRoute('app_user_index');
+        }
+    
+        return $this->render('user/edit.html.twig', [
+            'form' => $form->createView(),
+            'user' => $user,
+        ]);
+    }
+    
 }
